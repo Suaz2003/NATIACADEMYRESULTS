@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nati Academy — Result Checker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b1f3a;
+    --navy-deep:#071730;
+    --gold:#c9a227;
+    --gold-soft:#e6c766;
+    --cream:#f6f3ec;
+    --ink:#1b2430;
+    --line:#d9d2bd;
+    --error:#a83232;
+    --success:#1e6b45;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--cream);
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 20px 60px;
+  }
+
+  /* header / crest */
+  .crest{
+    width:64px; height:64px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:22px;
+    color:var(--navy);
+    background:radial-gradient(circle at 35% 30%, #fff 0%, var(--cream) 70%);
+    margin-bottom:18px;
+    box-shadow:0 0 0 1px var(--navy) inset;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(24px, 4vw, 32px);
+    color:var(--navy);
+    text-align:center;
+    letter-spacing:-0.01em;
+  }
+  .tagline{
+    font-size:13px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:6px;
+    font-weight:600;
+  }
+
+  /* card */
+  .card{
+    width:100%;
+    max-width:520px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    margin-top:32px;
+    padding:32px 28px;
+    position:relative;
+    box-shadow:0 20px 40px -24px rgba(11,31,58,0.35);
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height:4px;
+    background:linear-gradient(90deg, var(--navy) 0%, var(--gold) 100%);
+  }
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--navy);
+    margin-bottom:6px;
+  }
+  input, select{
+    width:100%;
+    padding:12px 14px;
+    font-family:'Space Mono', monospace;
+    font-size:15px;
+    border:1.5px solid var(--line);
+    border-radius:3px;
+    background:var(--cream);
+    color:var(--ink);
+    margin-bottom:18px;
+    transition:border-color .15s ease;
+  }
+  select{font-family:'Inter', sans-serif; font-weight:500;}
+  input:focus, select:focus{
+    outline:none;
+    border-color:var(--navy);
+  }
+
+  button{
+    width:100%;
+    padding:14px;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:3px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button:hover{background:var(--navy-deep);}
+  button:active{transform:scale(0.99);}
+  button:disabled{opacity:0.6; cursor:wait;}
+
+  .status{
+    margin-top:16px;
+    font-size:13px;
+    text-align:center;
+    min-height:18px;
+  }
+  .status.error{color:var(--error);}
+
+  /* result reveal */
+  .result{
+    display:none;
+    margin-top:28px;
+    border-top:1px dashed var(--line);
+    padding-top:24px;
+    animation:reveal .5s ease;
+  }
+  .result.show{display:block;}
+  @keyframes reveal{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .result-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:16px;
+  }
+  .result-name{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:600;
+    color:var(--navy);
+  }
+  .result-meta{
+    font-size:12px;
+    color:#6b7280;
+    margin-top:2px;
+  }
+  .seal{
+    width:44px; height:44px;
+    border-radius:50%;
+    background:var(--gold);
+    color:var(--navy);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.03em;
+    flex-shrink:0;
+    transform:rotate(-8deg);
+    box-shadow:0 2px 6px rgba(201,162,39,0.5);
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:#8a8577;
+    padding:6px 4px;
+    border-bottom:1.5px solid var(--navy);
+  }
+  td{
+    padding:9px 4px;
+    border-bottom:1px solid var(--line);
+    font-family:'Space Mono', monospace;
+  }
+  td:first-child, th:first-child{font-family:'Inter', sans-serif;}
+  tr:last-child td{border-bottom:none;}
+
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .summary-item{text-align:center; flex:1;}
+  .summary-value{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--navy);
+  }
+  .summary-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:#8a8577;
+    margin-top:2px;
+  }
+
+  footer{
+    margin-top:36px;
+    font-size:11.5px;
+    color:#9a9484;
+    text-align:center;
+    max-width:400px;
+  }
+  footer strong{color:var(--navy);}
+</style>
+</head>
+<body>
+
+  <div class="crest">NA</div>
+  <h1>Nati Academy</h1>
+  <div class="tagline">Result Checker</div>
+
+  <div class="card">
+    <label for="admNo">Admission Number</label>
+    <input id="admNo" type="text" placeholder="e.g. NA/2025/014" autocomplete="off">
+
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter your password" autocomplete="off">
+
+    <label for="term">Term</label>
+    <select id="term">
+      <option value="First Term">First Term</option>
+      <option value="Second Term">Second Term</option>
+      <option value="Third Term">Third Term</option>
+    </select>
+
+    <button id="checkBtn" onclick="checkResult()">Check Result</button>
+    <div class="status" id="status"></div>
+
+    <div class="result" id="result">
+      <div class="result-header">
+        <div>
+          <div class="result-name" id="rName">—</div>
+          <div class="result-meta" id="rMeta">—</div>
+        </div>
+        <div class="seal">VERIFIED</div>
+      </div>
+
+      <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th><th>1st CA</th><th>2nd CA</th><th>Ass</th>
+            <th>Total A</th><th>Exam</th><th>Total B</th><th>BF</th>
+            <th>Final</th><th>Grade</th><th>Remark</th>
+          </tr>
+        </thead>
+        <tbody id="rBody"></tbody>
+      </table>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-item">
+          <div class="summary-value" id="rAvg">—</div>
+          <div class="summary-label">Average</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value" id="rPos">—</div>
+          <div class="summary-label">Position</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Results are pulled directly from the school's official record sheet.
+    Contact the school office if your admission number is not recognized.
+  </footer>
+
+<script>
+  // ⚠️ Replace this with your own Google Apps Script Web App URL (see setup guide).
+  const API_URL = "https://script.google.com/macros/s/AKfycbwV-GM80-8v_XinqbfotKO-xRxifdLOH8d3B3-rWpOQohZMdj1kT6uCP3e15O8Su41c-w/exec";
+
+  async function checkResult(){
+    const admNo = document.getElementById('admNo').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const term = document.getElementById('term').value;
+    const status = document.getElementById('status');
+    const btn = document.getElementById('checkBtn');
+    const resultBox = document.getElementById('result');
+
+    status.textContent = "";
+    status.classList.remove('error');
+    resultBox.classList.remove('show');
+
+    if(!admNo || !password){
+      status.textContent = "Please enter your admission number and password.";
+      status.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Checking...";
+    status.textContent = "Looking up your record...";
+
+    try{
+      const url = `${API_URL}?admission_no=${encodeURIComponent(admNo)}&password=${encodeURIComponent(password)}&term=${encodeURIComponent(term)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if(!data.found){
+        status.textContent = "Admission number, password, or term not recognized.";
+        status.classList.add('error');
+        return;
+      }
+
+      renderResult(data);
+      status.textContent = "";
+      resultBox.classList.add('show');
+
+    }catch(err){
+      status.textContent = "Could not reach the result server. Check your connection and try again.";
+      status.classList.add('error');
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "Check Result";
+    }
+  }
+
+  function renderResult(data){
+    document.getElementById('rName').textContent = data.name;
+    document.getElementById('rMeta').textContent = `${data.class} · ${data.term} · ${data.session}`;
+
+    const tbody = document.getElementById('rBody');
+    tbody.innerHTML = "";
+    let finalSum = 0;
+    data.subjects.forEach(s => {
+      finalSum += Number(s.finalScore) || 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${s.name}</td><td>${s.ca1}</td><td>${s.ca2}</td><td>${s.ass}</td>
+        <td>${s.totalA}</td><td>${s.exam}</td><td>${s.totalB}</td><td>${s.bf}</td>
+        <td>${s.finalScore}</td><td>${s.grade}</td><td>${s.remark}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const avg = (finalSum / data.subjects.length).toFixed(1);
+    document.getElementById('rAvg').textContent = avg;
+    document.getElementById('rPos').textContent = data.position || "—";
+  }
+
+  // Allow Enter key to submit
+  document.getElementById('password').addEventListener('keydown', e => {
+    if(e.key === 'Enter') checkResult();
+  });
+</script>
+</body>
+</html>
