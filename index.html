@@ -295,7 +295,7 @@
     <div class="result" id="result">
       <div class="result-header">
         <img class="passport" id="rPhoto" src="" alt="Student passport"
-             onerror="this.style.display='none'; document.getElementById('photoFallback').style.display='flex';">
+             onerror="handlePhotoError(this)">
         <div class="passport-fallback" id="photoFallback" style="display:none;">📷</div>
         <div style="flex:1;">
           <div class="result-name" id="rName">—</div>
@@ -329,6 +329,16 @@
 <script>
   // ⚠️ Replace this with your own Google Apps Script Web App URL (see setup guide).
   const API_URL = "https://script.google.com/macros/s/AKfycbwV-GM80-8v_XinqbfotKO-xRxifdLOH8d3B3-rWpOQohZMdj1kT6uCP3e15O8Su41c-w/exec";
+
+  function handlePhotoError(img){
+    if(img.dataset.tried === 'jpg'){
+      img.dataset.tried = 'png';
+      img.src = img.src.replace(/\.jpg$/i, '.png');
+    } else {
+      img.style.display = 'none';
+      document.getElementById('photoFallback').style.display = 'flex';
+    }
+  }
 
   async function checkResult(){
     const admNo = document.getElementById('admNo').value.trim();
@@ -380,13 +390,14 @@
     document.getElementById('rName').textContent = data.name;
     document.getElementById('rMeta').textContent = `${data.class} · ${data.term} · ${data.session}`;
 
-    // Load passport photo: photos/<sanitized admission no>.jpg
-    const photoFile = admNo.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_') + '.jpg';
+    // Load passport photo: tries .jpg first, then .png, then falls back to icon
+    const baseName = admNo.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_');
     const photoImg = document.getElementById('rPhoto');
     const photoFallback = document.getElementById('photoFallback');
     photoImg.style.display = '';
     photoFallback.style.display = 'none';
-    photoImg.src = 'photos/' + photoFile;
+    photoImg.dataset.tried = 'jpg';
+    photoImg.src = 'photos/' + baseName + '.jpg';
 
     const tbody = document.getElementById('rBody');
     tbody.innerHTML = "";
