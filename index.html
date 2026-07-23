@@ -302,7 +302,7 @@
           <tr>
             <th>Subject</th><th>1st CA</th><th>2nd CA</th><th>Ass</th>
             <th>Total A</th><th>Exam</th><th>Total B</th><th>BF</th>
-            <th>Final</th><th>Grade</th><th>Remark</th>
+            <th>Final</th><th>Grade</th><th>Remark</th><th>Position</th>
           </tr>
         </thead>
         <tbody id="rBody"></tbody>
@@ -313,10 +313,6 @@
         <div class="summary-item">
           <div class="summary-value" id="rAvg">—</div>
           <div class="summary-label">Average</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-value" id="rPos">—</div>
-          <div class="summary-label">Position</div>
         </div>
       </div>
     </div>
@@ -397,13 +393,12 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${s.name}</td><td>${s.ca1}</td><td>${s.ca2}</td><td>${s.ass}</td>
         <td>${s.totalA}</td><td>${s.exam}</td><td>${s.totalB}</td><td>${s.bf}</td>
-        <td>${s.finalScore}</td><td>${s.grade}</td><td>${s.remark}</td>`;
+        <td>${s.finalScore}</td><td>${s.grade}</td><td>${s.remark}</td><td>${s.position || "—"}</td>`;
       tbody.appendChild(tr);
     });
 
     const avg = (finalSum / data.subjects.length).toFixed(1);
     document.getElementById('rAvg').textContent = avg;
-    document.getElementById('rPos').textContent = data.position || "—";
   }
 
   // Allow Enter key to submit
